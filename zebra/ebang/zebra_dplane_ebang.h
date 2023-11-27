@@ -11,6 +11,6 @@
 
 #include <zebra.h>
 
-// extern void zd_ebang_vty_init(void);
+extern void zd_ebang_vty_init(void);
 extern void zd_ebang_ifc_show(struct vty *vty);
 #endif
