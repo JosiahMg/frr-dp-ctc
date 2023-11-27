@@ -15,16 +15,16 @@
  *
  * Run zebra with '-M /path/to/sample_plugin.so' to load the module.
  */
-
 #include "config.h" /* Include this explicitly */
 #include "lib/zebra.h"
 #include "lib/libfrr.h"
 #include "zebra/zebra_dplane.h"
 #include "zebra/debug.h"
-
 #include "zebra/ebang/zebra_dplane_ebang.h"
 
 static const char *plugin_name = "zebra_dplane_ebang";
+
+extern struct zebra_privs_t zserv_privs;
 
 static struct zebra_dplane_provider *prov_p;
 
@@ -33,7 +33,7 @@ static struct zebra_dplane_provider *prov_p;
 */
 static int zd_ebang_init(void)
 {
-	zd_ebang_vty_init();
+	// zd_ebang_vty_init();
 	return 0;
 }
 
@@ -51,7 +51,7 @@ void zd_ebang_ifc_show(struct vty *vty)
 static int zd_ebang_start(struct zebra_dplane_provider *prov)
 {
 	/* Nothing special to do - we don't allocate anything. */
-	return zd_ebang_init();
+	// return zd_ebang_init();
 }
 
 
