@@ -20,45 +20,71 @@
 #include "lib/libfrr.h"
 #include "zebra/zebra_dplane.h"
 #include "zebra/debug.h"
-#include "zebra/ebang/zebra_dplane_ebang.h"
+#include "zebra/ctc/zebra_dplane_ctc.h"
 
-static const char *plugin_name = "zebra_dplane_ebang";
-
-extern struct zebra_privs_t zserv_privs;
+static const char *plugin_name = "zebra_dplane_ctc";
 
 static struct zebra_dplane_provider *prov_p;
+
+/* init sdk hardware */
+int ctc_sdk_entry(void) 
+{
+	int32_t ret = 0;
+	uint8_t ctc_shell_mode = 0;
+	uint8_t ctcs_api_en = 0;
+	printf("%s\n", "----------- ctc sdk entry init begin -----------");
+	ret = userinit(ctc_shell_mode, ctcs_api_en, NULL);
+	printf("%s\n", "----------- ctc sdk entry init end -----------");
+	return ret;
+}
+
 
 /* mh
 	init vtysh cmd
 */
-static int zd_ebang_init(void)
+static int zd_ctc_init(void)
 {
-	zd_ebang_vty_init();
+	zd_ctc_vty_init();
 	return 0;
 }
 
 
-void zd_ebang_ifc_show(struct vty *vty)
+void zd_ctc_ifc_show(struct vty *vty)
 {
+	int32_t ret = 0;
 	vty_out(vty, "%30s\n%30s\n", "Dataplane Centec Interface",
 		"=======================");
+	ret = sys_usw_mac_show_port_maclink(0);
+    if (ret < 0)
+    {
+        vty_out(vty, "%30s\n", "port mac link error");
+    }
+	else
+	{
+		vty_out(vty, "%30s\n", "port mac link success");
+	}
+
 }
 
 
 /*
  * Startup/init callback, called from the dataplane.
  */
-static int zd_ebang_start(struct zebra_dplane_provider *prov)
+static int zd_ctc_start(struct zebra_dplane_provider *prov)
 {
-	/* Nothing special to do - we don't allocate anything. */
-	return zd_ebang_init();
+	int ret = 0;
+	/* init sdk hardware */
+	ret = ctc_sdk_entry();
+	ret = zd_ctc_init();
+	/* init vty. */
+	return ret;
 }
 
 
 /*
  * Shutdown/cleanup callback, called from the dataplane pthread.
  */
-static int zd_ebang_fini(struct zebra_dplane_provider *prov, bool early)
+static int zd_ctc_fini(struct zebra_dplane_provider *prov, bool early)
 {
 	/* Nothing special to do. */
 	return 0;
@@ -68,7 +94,7 @@ static int zd_ebang_fini(struct zebra_dplane_provider *prov, bool early)
  * Callback from the dataplane to process incoming work; this runs in the
  * dplane pthread.
  */
-static int zd_ebang_process(struct zebra_dplane_provider *prov)
+static int zd_ctc_process(struct zebra_dplane_provider *prov)
 {
 	int counter, limit;
 	struct zebra_dplane_ctx *ctx;
@@ -95,7 +121,7 @@ static int zd_ebang_process(struct zebra_dplane_provider *prov)
  * Init entry point called during zebra startup. This is registered during
  * module init.
  */
-static int zd_ebang_plugin_init(struct event_loop *tm)
+static int zd_ctc_plugin_init(struct event_loop *tm)
 {
 	int ret;
 
@@ -110,9 +136,9 @@ static int zd_ebang_plugin_init(struct event_loop *tm)
 	 */
 	ret = dplane_provider_register(plugin_name, DPLANE_PRIO_PRE_KERNEL,
 				       DPLANE_PROV_FLAGS_DEFAULT,
-				       zd_ebang_start,
-				       zd_ebang_process,
-				       zd_ebang_fini,
+				       zd_ctc_start,
+				       zd_ctc_process,
+				       zd_ctc_fini,
 				       NULL,
 				       &prov_p);
 
@@ -126,9 +152,9 @@ static int zd_ebang_plugin_init(struct event_loop *tm)
 /*
  * Base FRR loadable module info: basic info including module entry-point.
  */
-static int zd_ebang_module_init(void)
+static int zd_ctc_module_init(void)
 {
-	hook_register(frr_late_init, zd_ebang_plugin_init);
+	hook_register(frr_late_init, zd_ctc_plugin_init);
 	return 0;
 }
 
@@ -136,5 +162,5 @@ FRR_MODULE_SETUP(
 	.name = "dplane_sample",
 	.version = "0.0.1",
 	.description = "Dataplane Sample Plugin",
-	.init = zd_ebang_module_init,
+	.init = zd_ctc_module_init,
 );

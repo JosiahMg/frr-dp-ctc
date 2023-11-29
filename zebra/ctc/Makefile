@@ -13,7 +13,7 @@ SRCS := $(wildcard *.c)
 OBJS := $(SRCS:.c=.o)
 
 # Output library name
-OUTPUT := dp_ebang_plugin.so
+OUTPUT := dp_ctc_plugin.so
 
 # Default rule
 all: $(OUTPUT)

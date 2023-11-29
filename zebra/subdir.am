@@ -257,10 +257,19 @@ zebra_zebra_dplane_dpdk_la_LDFLAGS = -avoid-version -module -shared -export-dyna
 zebra_zebra_dplane_dpdk_la_CFLAGS = $(DPDK_CFLAGS)
 zebra_zebra_dplane_dpdk_la_LIBADD  = $(DPDK_LIBS)
 
-if DP_EBANG
-module_LTLIBRARIES += zebra/zebra_dplane_ebang.la
+if DP_CTC
+module_LTLIBRARIES += zebra/dplane_ctc.la
 endif
 
-zebra_zebra_dplane_ebang_la_SOURCES = zebra/ebang/zebra_dplane_ebang.c zebra/ebang/zebra_dplane_ebang_vty.c
-zebra_zebra_dplane_ebang_la_LDFLAGS = $(MODULE_LDFLAGS)
-zebra_zebra_dplane_ebang_la_LIBADD  = 
+SDK_DIR = /home/admin/ctcsdk
+zebra_dplane_ctc_la_SOURCES = zebra/ctc/zebra_dplane_ctc.c zebra/ctc/zebra_dplane_ctc_vty.c
+zebra_dplane_ctc_la_LDFLAGS = $(MODULE_LDFLAGS) -fPIC -L$(SDK_DIR)/build.aarch64.d/lib.linux-board
+zebra_dplane_ctc_la_CFLAGS = -g -O0 -DSDK_IN_USERMODE -DTSINGMA
+zebra_dplane_ctc_la_CFLAGS += -I$(SDK_DIR)/core
+zebra_dplane_ctc_la_CFLAGS += -I$(SDK_DIR)/core/api/include
+zebra_dplane_ctc_la_CFLAGS += -I$(SDK_DIR)/sal/include
+zebra_dplane_ctc_la_CFLAGS += -I$(SDK_DIR)/dal/include
+zebra_dplane_ctc_la_CFLAGS += -I$(SDK_DIR)/ctccli/sdkcli
+zebra_dplane_ctc_la_CFLAGS += -I$(SDK_DIR)/ctccli/sdkcli/asw
+zebra_dplane_ctc_la_CFLAGS += -I$(SDK_DIR)/libctccli/include
+zebra_dplane_ctc_la_LIBADD  = -lctcsdk -lapp
