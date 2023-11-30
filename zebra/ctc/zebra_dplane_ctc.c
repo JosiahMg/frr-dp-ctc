@@ -32,13 +32,13 @@ int ctc_sdk_entry(void)
 	int32_t ret = 0;
 	uint8_t ctc_shell_mode = 0;
 	uint8_t ctcs_api_en = 1;
-	zlog_debug("----------- ctc sdk entry init begin -----------");
+	zlog_debug("[dplane-ctc] ctc sdk entry init begin");
 	ret = userinit(ctc_shell_mode, ctcs_api_en, NULL);
 	if (ret < 0) 
 	{
-		zlog_err("init sdk hardware failed, error code: %d", ret);
+		zlog_err("[dplane-ctc] init sdk hardware failed, error code: %d", ret);
 	}
-	zlog_debug("----------- ctc sdk entry init end -----------");
+	zlog_debug("[dplane-ctc]  ctc sdk entry init end");
 	return ret;
 }
 
