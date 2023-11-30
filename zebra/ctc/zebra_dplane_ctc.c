@@ -31,10 +31,14 @@ int ctc_sdk_entry(void)
 {
 	int32_t ret = 0;
 	uint8_t ctc_shell_mode = 0;
-	uint8_t ctcs_api_en = 0;
-	printf("%s\n", "----------- ctc sdk entry init begin -----------");
+	uint8_t ctcs_api_en = 1;
+	zlog_debug("----------- ctc sdk entry init begin -----------");
 	ret = userinit(ctc_shell_mode, ctcs_api_en, NULL);
-	printf("%s\n", "----------- ctc sdk entry init end -----------");
+	if (ret < 0) 
+	{
+		zlog_err("init sdk hardware failed, error code: %d", ret);
+	}
+	zlog_debug("----------- ctc sdk entry init end -----------");
 	return ret;
 }
 
@@ -57,7 +61,7 @@ void zd_ctc_ifc_show(struct vty *vty)
 	ret = sys_usw_mac_show_port_maclink(0);
     if (ret < 0)
     {
-        vty_out(vty, "%30s\n", "port mac link error");
+        vty_out(vty, "%30s:%d\n", "port mac link error code: ", ret);
     }
 	else
 	{
